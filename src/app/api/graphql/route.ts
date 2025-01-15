@@ -1,5 +1,46 @@
-import { createSchema, createYoga } from \"graphql-yoga\";
-import { db } from \"../../../services/db/index.js\";
+import { createSchema, createYoga } from 'graphql-yoga';
+import { db } from '../../../services/db/index.js';
+import Database from 'better-sqlite3';
+
+interface DBGameweek {
+  id: number;
+  name: string;
+  deadline_time: string;
+  finished: number;
+  is_current: number;
+  is_previous: number;
+  is_next: number;
+  average_entry_score: number;
+  highest_score: number;
+  data_checked: number;
+}
+
+interface DBTeam {
+  id: number;
+  name: string;
+  short_name: string;
+  strength: number;
+  position: number;
+  played: number;
+  points: number;
+  form: string;
+}
+
+interface DBPlayer {
+  id: number;
+  code: number;
+  element_type: number;
+  first_name: string;
+  second_name: string;
+  web_name: string;
+  team: number;
+  status: string;
+  form: string;
+  total_points: number;
+  event_points: number;
+  selected_by_percent: string;
+  now_cost: number;
+}
 
 const typeDefs = `
   type Query {
@@ -61,7 +102,7 @@ const resolvers = {
   Query: {
     gameweekStatus: () => {
       const status = db.getLatestStatus();
-      const currentGameweek = db.getCurrentGameweek();
+      const currentGameweek = db.getCurrentGameweek() as DBGameweek | undefined;
       return {
         isLive: status?.is_live ?? false,
         lastChecked: status?.checked_at ?? new Date().toISOString(),
@@ -80,7 +121,7 @@ const resolvers = {
       };
     },
     currentGameweek: () => {
-      const gameweek = db.getCurrentGameweek();
+      const gameweek = db.getCurrentGameweek() as DBGameweek | undefined;
       return gameweek ? {
         id: gameweek.id,
         name: gameweek.name,
@@ -95,7 +136,7 @@ const resolvers = {
       } : null;
     },
     gameweeks: () => {
-      const gameweeks = db.prepare(\"SELECT * FROM gameweeks\").all();
+      const gameweeks = (db as any).db.prepare('SELECT * FROM gameweeks').all() as DBGameweek[];
       return gameweeks.map(gw => ({
         id: gw.id,
         name: gw.name,
@@ -110,7 +151,7 @@ const resolvers = {
       }));
     },
     teams: () => {
-      const teams = db.prepare(\"SELECT * FROM teams\").all();
+      const teams = (db as any).db.prepare('SELECT * FROM teams').all() as DBTeam[];
       return teams.map(team => ({
         id: team.id,
         name: team.name,
@@ -123,7 +164,7 @@ const resolvers = {
       }));
     },
     players: () => {
-      const players = db.prepare(\"SELECT * FROM players\").all();
+      const players = (db as any).db.prepare('SELECT * FROM players').all() as DBPlayer[];
       return players.map(player => ({
         id: player.id,
         code: player.code,
@@ -150,7 +191,7 @@ const schema = createSchema({
 
 const { handleRequest } = createYoga({
   schema,
-  graphqlEndpoint: \"/api/graphql\",
+  graphqlEndpoint: '/api/graphql',
   fetchAPI: { Response }
 });
 
