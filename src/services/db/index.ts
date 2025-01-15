@@ -413,6 +413,39 @@ class DBService {
       LIMIT 1
     `).get();
   }
+
+  public getGameweekStatus() {
+    try {
+      console.log('Fetching comprehensive gameweek status');
+      
+      // Get the current gameweek
+      const currentGameweek = this.db.prepare(`
+        SELECT id, name, deadline_time, finished, is_current
+        FROM gameweeks 
+        WHERE is_current = 1 
+        LIMIT 1
+      `).get();
+
+      // Get the latest status
+      const latestStatus = this.db.prepare(`
+        SELECT is_live, checked_at
+        FROM gameweek_status
+        ORDER BY checked_at DESC
+        LIMIT 1
+      `).get();
+
+      console.log('Status check results:', { currentGameweek, latestStatus });
+      
+      return {
+        currentGameweek,
+        isLive: latestStatus?.is_live ?? false,
+        lastChecked: latestStatus?.checked_at ?? new Date().toISOString()
+      };
+    } catch (error) {
+      console.error('Error fetching gameweek status:', error);
+      throw error;
+    }
+  }
 }
 
 export const db = DBService.getInstance(); 

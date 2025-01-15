@@ -1,12 +1,25 @@
 import { NextResponse } from 'next/server';
 import { db } from '../../../../services/db/index.js';
 
+interface GameweekData {
+  id: number;
+  name: string;
+  deadline_time: string;
+  finished: number;
+  is_current: number;
+}
+
 export async function GET() {
   try {
-    const status = db.getLatestStatus();
+    // Get current gameweek info
+    const currentGameweek = db.getCurrentGameweek() as GameweekData | undefined;
+    
+    // Get latest status
+    const latestStatus = db.getLatestStatus();
 
-    if (!status) {
-      console.log('No status found, initializing...');
+    // If we have no data at all yet
+    if (!currentGameweek && !latestStatus) {
+      console.log('No gameweek or status data found, initializing...');
       db.recordGameweekStatus(false);
       return NextResponse.json({
         success: true,
@@ -21,8 +34,14 @@ export async function GET() {
     return NextResponse.json({
       success: true,
       data: {
-        isLive: status.is_live,
-        lastChecked: status.checked_at,
+        currentGameweek: currentGameweek ? {
+          id: currentGameweek.id,
+          name: currentGameweek.name,
+          deadlineTime: currentGameweek.deadline_time,
+          finished: Boolean(currentGameweek.finished)
+        } : null,
+        isLive: Boolean(latestStatus?.is_live),
+        lastChecked: latestStatus?.checked_at ?? new Date().toISOString()
       }
     });
   } catch (error) {
