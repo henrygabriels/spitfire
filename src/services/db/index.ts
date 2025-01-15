@@ -7,9 +7,22 @@ class DBService {
   private db: Database.Database;
 
   private constructor() {
-    this.db = new Database('fpl.db');
-    this.db.pragma('journal_mode = WAL');
-    this.initialize();
+    try {
+      console.log('Initializing database...');
+      console.log('Database path:', process.cwd() + '/fpl.db');
+      
+      this.db = new Database('fpl.db', {
+        verbose: console.log
+      });
+      
+      this.db.pragma('journal_mode = WAL');
+      this.initialize();
+      
+      console.log('Database initialized successfully');
+    } catch (error) {
+      console.error('Error initializing database:', error);
+      throw error;
+    }
   }
 
   public static getInstance(): DBService {
@@ -20,9 +33,15 @@ class DBService {
   }
 
   private initialize(): void {
-    const statements = SCHEMA.split(';').filter(stmt => stmt.trim());
-    for (const statement of statements) {
-      this.db.prepare(statement).run();
+    try {
+      const statements = SCHEMA.split(';').filter(stmt => stmt.trim());
+      for (const statement of statements) {
+        this.db.prepare(statement).run();
+      }
+      console.log('Database schema initialized');
+    } catch (error) {
+      console.error('Error initializing database schema:', error);
+      throw error;
     }
   }
 

@@ -4,19 +4,43 @@ import next from 'next';
 import { initializeCronJobs } from './src/services/cronService.js';
 
 const dev = process.env.NODE_ENV !== 'production';
+const hostname = process.env.HOSTNAME || 'localhost';
+const port = process.env.PORT || 3000;
+
 const app = next({ dev });
 const handle = app.getRequestHandler();
 
+process.on('uncaughtException', (error) => {
+  console.error('Uncaught Exception:', error);
+});
+
+process.on('unhandledRejection', (error) => {
+  console.error('Unhandled Rejection:', error);
+});
+
 app.prepare().then(() => {
-  // Initialize cron jobs
-  initializeCronJobs();
-  
-  createServer((req, res) => {
-    if (!req.url) return;
-    const parsedUrl = parse(req.url, true);
-    handle(req, res, parsedUrl);
-  }).listen(3000, (err?: Error) => {
-    if (err) throw err;
-    console.log('> Ready on http://localhost:3000');
-  });
+  try {
+    // Initialize cron jobs
+    console.log('Starting server initialization...');
+    initializeCronJobs();
+    
+    createServer(async (req, res) => {
+      try {
+        if (!req.url) return;
+        const parsedUrl = parse(req.url, true);
+        await handle(req, res, parsedUrl);
+      } catch (err) {
+        console.error('Error handling request:', err);
+        res.statusCode = 500;
+        res.end('Internal Server Error');
+      }
+    }).listen(port, () => {
+      console.log(`> Ready on http://${hostname}:${port}`);
+      console.log('Environment:', process.env.NODE_ENV);
+      console.log('Working Directory:', process.cwd());
+    });
+  } catch (err) {
+    console.error('Error during server initialization:', err);
+    process.exit(1);
+  }
 }); 
