@@ -1,36 +1,82 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Spitfire FPL
+
+A real-time Fantasy Premier League (FPL) data service that automatically tracks gameweek status and player updates.
+
+## Features
+
+- 🔄 Automatic polling of the official FPL API
+- ⚡ Real-time updates during active gameweeks (1-minute intervals)
+- 📊 SQLite database for reliable data storage
+- 🎯 Smart polling strategy:
+  - Every minute during active gameweeks
+  - Every 10 minutes during non-active periods
+- 🌐 Next.js API endpoints for data access
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
+- Node.js (v18 or higher)
+- npm
+
+### Installation
+
+1. Clone the repository:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/yourusername/spitfire.git
+cd spitfire
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Install dependencies:
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. Start the development server:
+```bash
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The server will start on `http://localhost:3000`.
 
-## Learn More
+### Database Setup
 
-To learn more about Next.js, take a look at the following resources:
+The database will be automatically created and populated when you first run the server. If you need to manually populate the database:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm run populate-db
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## API Endpoints
 
-## Deploy on Vercel
+### GET `/api/fpl/gameweek-status`
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Returns the current gameweek status:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```json
+{
+  "success": true,
+  "data": {
+    "isLive": boolean,
+    "lastChecked": string
+  }
+}
+```
+
+## Development
+
+- `npm run dev` - Start the development server
+- `npm run build` - Build for production
+- `npm start` - Start the production server
+- `npm run lint` - Run ESLint
+- `npm run fetch-fpl` - Manually fetch latest FPL data
+- `npm run populate-db` - Populate/update the database
+
+## License
+
+MIT
+
+## Acknowledgments
+
+- [Official Fantasy Premier League](https://fantasy.premierleague.com/)
+- Built with Next.js, TypeScript, and SQLite
