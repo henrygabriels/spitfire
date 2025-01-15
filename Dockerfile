@@ -8,6 +8,10 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 
+# Set Node.js environment variables
+ENV NODE_ENV=production
+ENV NODE_OPTIONS='--loader ts-node/esm'
+
 # Copy package files
 COPY package*.json ./
 
@@ -19,6 +23,9 @@ COPY . .
 
 # Build the application
 RUN npm run build
+
+# Expose the port the app runs on
+EXPOSE 3000
 
 # Start the server
 CMD ["npm", "start"] 
