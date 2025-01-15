@@ -437,7 +437,7 @@ class DBService {
         FROM gameweek_status
         ORDER BY checked_at DESC
         LIMIT 1
-      `).get();
+      `).get() as GameweekStatus | null;
 
       console.log('Status check results:', { currentGameweek, latestStatus });
       
