@@ -6,11 +6,10 @@
   "scripts": {
     "dev": "NODE_OPTIONS='--loader ts-node/esm' node server.ts",
     "build": "next build && tsc --project tsconfig.server.json",
-    "start": "NODE_ENV=production node dist/server.js",
+    "start": "NODE_ENV=production NODE_OPTIONS='--loader ts-node/esm' node dist/server.js",
     "lint": "next lint",
     "fetch-fpl": "NODE_OPTIONS='--loader ts-node/esm' node src/scripts/fetch-fpl-data.ts",
-    "populate-db": "NODE_OPTIONS='--loader ts-node/esm' node src/scripts/populate-db.ts",
-    "postinstall": "npm run build"
+    "populate-db": "NODE_OPTIONS='--loader ts-node/esm' node src/scripts/populate-db.ts"
   },
   "dependencies": {
     "@types/node": "20.11.5",

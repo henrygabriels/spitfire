@@ -8,15 +8,15 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 
-# Set Node.js environment variables
-ENV NODE_ENV=production
-ENV NODE_OPTIONS='--loader ts-node/esm'
-
 # Copy package files
 COPY package*.json ./
 
 # Install dependencies
 RUN npm ci
+
+# Set Node.js environment variables
+ENV NODE_ENV=production
+ENV NODE_OPTIONS='--loader ts-node/esm'
 
 # Copy the rest of the application
 COPY . .
