@@ -6,10 +6,16 @@ export async function GET() {
     const status = db.getLatestStatus();
 
     if (!status) {
-      return NextResponse.json(
-        { success: false, error: 'No status data available' },
-        { status: 404 }
-      );
+      console.log('No status found, initializing...');
+      db.recordGameweekStatus(false);
+      return NextResponse.json({
+        success: true,
+        data: {
+          isLive: false,
+          lastChecked: new Date().toISOString(),
+          note: 'Initial status - waiting for first update'
+        }
+      });
     }
 
     return NextResponse.json({

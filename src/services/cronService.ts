@@ -53,26 +53,21 @@ async function checkGameweekStatus() {
       liveUpdateJob = null;
     }
     
-    logStatus('📊 Status update', {
-      hasCurrentGameweek,
-      gameweekId: currentGameweek?.id,
-      currentPollInterval: hasCurrentGameweek ? '1 minute' : '10 minutes'
-    });
-    
+    logStatus('✅ Status check completed');
   } catch (error) {
-    logStatus('❌ Error in cron job:', error);
+    logStatus('❌ Error checking gameweek status:', error);
   }
 }
 
-export function initializeCronJobs() {
+export async function initializeCronJobs() {
   if (isInitialized) return;
   
-  logStatus('Initializing cron jobs...');
+  logStatus('🚀 Initializing cron jobs');
   
-  // Run initial check immediately
-  checkGameweekStatus();
+  // Run immediately on startup
+  await checkGameweekStatus();
   
-  // Then schedule every 10 minutes
+  // Then schedule regular checks
   cron.schedule('*/10 * * * *', checkGameweekStatus);
   
   isInitialized = true;

@@ -18,11 +18,19 @@ process.on('unhandledRejection', (error) => {
   console.error('Unhandled Rejection:', error);
 });
 
-app.prepare().then(() => {
+app.prepare().then(async () => {
   try {
-    // Initialize cron jobs
     console.log('Starting server initialization...');
-    initializeCronJobs();
+    console.log('Environment:', process.env.NODE_ENV);
+    console.log('Working Directory:', process.cwd());
+    
+    // Initialize cron jobs
+    console.log('Initializing cron jobs...');
+    await initializeCronJobs().catch(error => {
+      console.error('Failed to initialize cron jobs:', error);
+      throw error;
+    });
+    console.log('Cron jobs initialized successfully');
     
     createServer(async (req, res) => {
       try {
@@ -36,8 +44,6 @@ app.prepare().then(() => {
       }
     }).listen(port, () => {
       console.log(`> Ready on http://${hostname}:${port}`);
-      console.log('Environment:', process.env.NODE_ENV);
-      console.log('Working Directory:', process.cwd());
     });
   } catch (err) {
     console.error('Error during server initialization:', err);

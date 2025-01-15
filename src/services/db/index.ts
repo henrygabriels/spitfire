@@ -47,21 +47,36 @@ class DBService {
 
   // Gameweek Status methods
   public recordGameweekStatus(isLive: boolean): void {
-    const stmt = this.db.prepare(`
-      INSERT INTO gameweek_status (is_live)
-      VALUES (?)
-    `);
-    stmt.run(isLive ? 1 : 0);
+    try {
+      console.log('Recording gameweek status:', { isLive });
+      const stmt = this.db.prepare(`
+        INSERT INTO gameweek_status (is_live)
+        VALUES (?)
+      `);
+      stmt.run(isLive ? 1 : 0);
+      console.log('Successfully recorded gameweek status');
+    } catch (error) {
+      console.error('Error recording gameweek status:', error);
+      throw error;
+    }
   }
 
   public getLatestStatus(): { is_live: boolean; checked_at: string } | null {
-    const stmt = this.db.prepare(`
-      SELECT is_live, checked_at
-      FROM gameweek_status
-      ORDER BY checked_at DESC
-      LIMIT 1
-    `);
-    return stmt.get() as { is_live: boolean; checked_at: string } | null;
+    try {
+      console.log('Fetching latest gameweek status');
+      const stmt = this.db.prepare(`
+        SELECT is_live, checked_at
+        FROM gameweek_status
+        ORDER BY checked_at DESC
+        LIMIT 1
+      `);
+      const result = stmt.get() as { is_live: boolean; checked_at: string } | null;
+      console.log('Latest status result:', result);
+      return result;
+    } catch (error) {
+      console.error('Error fetching latest status:', error);
+      throw error;
+    }
   }
 
   // Core data methods
