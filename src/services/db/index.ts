@@ -2,6 +2,11 @@ import Database from 'better-sqlite3';
 import { SCHEMA } from './schema.js';
 import type { FPLGameweek, FPLTeam, FPLPlayer, FPLElementType, FPLElementStat } from '../../types/fpl.js';
 
+interface GameweekStatus {
+  is_live: boolean;
+  checked_at: string;
+}
+
 class DBService {
   private static instance: DBService;
   private db: Database.Database;
@@ -61,7 +66,7 @@ class DBService {
     }
   }
 
-  public getLatestStatus(): { is_live: boolean; checked_at: string } | null {
+  public getLatestStatus(): GameweekStatus | null {
     try {
       console.log('Fetching latest gameweek status');
       const stmt = this.db.prepare(`
@@ -70,7 +75,7 @@ class DBService {
         ORDER BY checked_at DESC
         LIMIT 1
       `);
-      const result = stmt.get() as { is_live: boolean; checked_at: string } | null;
+      const result = stmt.get() as GameweekStatus | null;
       console.log('Latest status result:', result);
       return result;
     } catch (error) {
